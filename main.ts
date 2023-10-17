@@ -40,13 +40,19 @@ scene.onHitWall(SpriteKind.Player, function (sprite, location) {
             for (let valeur of animNotMoving.frames) {
                 valeur.flipX()
             }
-            isFacingRight = false
+            for (let valeur2 of animJump.frames) {
+                valeur2.flipX()
+            }
         }
-        animation.setAction(Zale, ActionKind.Idle)
-    } else {
-    	
+        if (controller.left.isPressed() || controller.right.isPressed()) {
+            console.log("WALKIN")
+            animation.setAction(Zale, ActionKind.Idle)
+        } else {
+            console.log("IDLE")
+            animation.setAction(Zale, ActionKind.Idle)
+        }
+        isJumping = false
     }
-    isJumping = false
 })
 function creerAnims () {
     animWalking = animation.createAnimation(ActionKind.Walking, 100)
@@ -231,7 +237,7 @@ function Makelevel () {
     liste = [tilemap`levelmap0`, tilemap`niveau1`, tilemap`niveau10`]
     tiles.setCurrentTilemap(liste[niveau])
     BouncingEnemies()
-    for (let valeur2 of tiles.getTilesByType(assets.tile`myTile15`)) {
+    for (let valeur22 of tiles.getTilesByType(assets.tile`myTile15`)) {
         pièce = sprites.create(assets.image`pièce`, SpriteKind.element)
         animation.runImageAnimation(
         pièce,
@@ -426,10 +432,10 @@ function Makelevel () {
         100,
         true
         )
-        tiles.placeOnTile(pièce, valeur2)
-        tiles.setTileAt(valeur2, assets.tile`transparency16`)
+        tiles.placeOnTile(pièce, valeur22)
+        tiles.setTileAt(valeur22, assets.tile`transparency16`)
     }
-    for (let valeur22 of tiles.getTilesByType(assets.tile`myTile16`)) {
+    for (let valeur222 of tiles.getTilesByType(assets.tile`myTile16`)) {
         coeur = sprites.create(img`
             . . . . . . . . . . . . . . . . 
             . . f f f f f f . f f f f f f . 
@@ -488,8 +494,8 @@ function Makelevel () {
         400,
         true
         )
-        tiles.placeOnTile(coeur, valeur22)
-        tiles.setTileAt(valeur22, assets.tile`transparency16`)
+        tiles.placeOnTile(coeur, valeur222)
+        tiles.setTileAt(valeur222, assets.tile`transparency16`)
     }
     for (let valeur3 of tiles.getTilesByType(assets.tile`myTile17`)) {
         perle = sprites.create(img`
@@ -516,10 +522,7 @@ function Makelevel () {
 }
 controller.right.onEvent(ControllerButtonEvent.Released, function () {
     if (!(isJumping)) {
-        for (let valeur62 of animNotMoving.frames) {
-            valeur62.flipX()
-        }
-        animation.stopAnimation(animation.AnimationTypes.All, Zale)
+        animation.setAction(Zale, ActionKind.Idle)
     }
 })
 function BouncingEnemies () {
@@ -724,7 +727,13 @@ function BouncingEnemies () {
     }
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    leaveIdle()
     if (!(isJumping)) {
+        if (!(isFacingRight)) {
+            for (let valeur6 of animJump.frames) {
+                valeur6.flipX()
+            }
+        }
         animation.setAction(Zale, ActionKind.Jumping)
         Zale.vy += -100
         music.play(music.createSoundEffect(WaveShape.Square, 400, 600, 255, 0, 300, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
@@ -749,38 +758,69 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.element, function (sprite, other
     music.play(music.melodyPlayable(music.baDing), music.PlaybackMode.UntilDone)
 })
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+    leaveIdle()
     if (!(isAttacking)) {
-        isAttacking = true
-        projectile = sprites.createProjectileFromSprite(img`
-            . . . . . . . . . . . . 1 b . . 
-            . . . . . . . . . . . . 1 b . . 
-            . . . . . . . . . . . . . b . . 
-            . . . . . . . . . . . . 1 b . . 
-            . . . . . . . . . . . . . b . . 
-            . . . . . . . . . . . . 1 b . . 
-            . . . . . . . . . . . . b . . . 
-            . . . . . . . . . . 1 . b . . . 
-            . . . . . . . . . . . b . . . . 
-            . . . . . . . . . 1 b . . . . . 
-            . . . . . . . . . b . . . . . . 
-            . . . . . . . . b . . . . . . . 
-            . . 1 . 1 . b b . . . . . . . . 
-            b b b b b b 1 . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `, Zale, 120, 0)
-        if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingLeft))) {
-            projectile.image.flipX()
+        if (!(isFacingRight)) {
+            for (let valeur62 of animAttack.frames) {
+                valeur62.flipX()
+            }
         }
+        if (isFacingRight) {
+            projectile = sprites.createProjectileFromSprite(img`
+                . . . . . . . . . . . . 1 b . . 
+                . . . . . . . . . . . . 1 b . . 
+                . . . . . . . . . . . . . b . . 
+                . . . . . . . . . . . . 1 b . . 
+                . . . . . . . . . . . . . b . . 
+                . . . . . . . . . . . . 1 b . . 
+                . . . . . . . . . . . . b . . . 
+                . . . . . . . . . . 1 . b . . . 
+                . . . . . . . . . . . b . . . . 
+                . . . . . . . . . 1 b . . . . . 
+                . . . . . . . . . b . . . . . . 
+                . . . . . . . . b . . . . . . . 
+                . . 1 . 1 . b b . . . . . . . . 
+                b b b b b b 1 . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                `, Zale, 200, 0)
+        } else {
+            projectile = sprites.createProjectileFromSprite(img`
+                . . b 1 . . . . . . . . . . . . 
+                . . b 1 . . . . . . . . . . . . 
+                . . b . . . . . . . . . . . . . 
+                . . b 1 . . . . . . . . . . . . 
+                . . b . . . . . . . . . . . . . 
+                . . b 1 . . . . . . . . . . . . 
+                . . . b . . . . . . . . . . . . 
+                . . . b . 1 . . . . . . . . . . 
+                . . . . b . . . . . . . . . . . 
+                . . . . . b 1 . . . . . . . . . 
+                . . . . . . b . . . . . . . . . 
+                . . . . . . . b . . . . . . . . 
+                . . . . . . . . b b . 1 . 1 . . 
+                . . . . . . . . . 1 b b b b b b 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                `, Zale, -200, 0)
+        }
+        animation.setAction(Zale, ActionKind.Attack)
         pause(200)
+        if (!(isFacingRight)) {
+            for (let valeur622 of animAttack.frames) {
+                valeur622.flipX()
+            }
+        }
         sprites.destroy(projectile)
         isAttacking = false
+        animation.setAction(Zale, ActionKind.Idle)
     }
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
+    leaveIdle()
     if (!(isFacingRight)) {
-        for (let valeur6 of animWalking.frames) {
-            valeur6.flipX()
+        for (let valeur63 of animWalking.frames) {
+            valeur63.flipX()
         }
         isFacingRight = true
     }
@@ -788,15 +828,22 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
         animation.setAction(Zale, ActionKind.Walking)
     }
 })
+function leaveIdle () {
+    if (!(isFacingRight)) {
+        for (let valeur632 of animNotMoving.frames) {
+            valeur632.flipX()
+        }
+    }
+}
 info.onLifeZero(function () {
     game.gameOver(false)
 })
 controller.left.onEvent(ControllerButtonEvent.Released, function () {
     if (!(isJumping)) {
-        for (let valeur622 of animNotMoving.frames) {
-            valeur622.flipX()
+        for (let valeur6222 of animNotMoving.frames) {
+            valeur6222.flipX()
         }
-        animation.stopAnimation(animation.AnimationTypes.All, Zale)
+        animation.setAction(Zale, ActionKind.Idle)
     }
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.element3, function (sprite, otherSprite) {
@@ -806,13 +853,12 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.element3, function (sprite, othe
     music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.UntilDone)
 })
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (isFacingRight) {
+    leaveIdle()
+    isFacingRight = false
+    if (!(isJumping)) {
         for (let valeur7 of animWalking.frames) {
             valeur7.flipX()
         }
-        isFacingRight = false
-    }
-    if (!(isJumping)) {
         animation.setAction(Zale, ActionKind.Walking)
     }
 })
@@ -838,16 +884,16 @@ let pièce: Sprite = null
 let niveau = 0
 let liste: tiles.TileMapData[] = []
 let doublejump = false
-let animJump: animation.Animation = null
-let animAttack: animation.Animation = null
 let Zale: Sprite = null
 let compteur_de_vie = 0
 let isAttacking = false
 let isFacingRight = false
 let isJumping = false
+let animJump: animation.Animation = null
 let menu = 0
 let animWalking: animation.Animation = null
 let animNotMoving: animation.Animation = null
+let animAttack: animation.Animation = null
 isJumping = false
 isFacingRight = true
 isAttacking = false
