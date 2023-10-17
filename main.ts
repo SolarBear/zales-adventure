@@ -1,12 +1,5 @@
 enum ActionKind {
-    WalkingRight,
-    IdleRight,
-    JumpingRight,
-    AttackRight,
-    WalkingLeft,
-    IdleLeft,
-    JumpingLeft,
-    AttackLeft,
+    Attack,
     Walking,
     Idle,
     Jumping
@@ -41,9 +34,23 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.element2, function (sprite, othe
         music.play(music.melodyPlayable(music.beamUp), music.PlaybackMode.UntilDone)
     }
 })
+scene.onHitWall(SpriteKind.Player, function (sprite, location) {
+    if (isJumping) {
+        if (!(isFacingRight)) {
+            for (let valeur of animNotMoving.frames) {
+                valeur.flipX()
+            }
+            isFacingRight = false
+        }
+        animation.setAction(Zale, ActionKind.Idle)
+    } else {
+    	
+    }
+    isJumping = false
+})
 function creerAnims () {
-    animWalkingRight = animation.createAnimation(ActionKind.WalkingRight, 100)
-    animWalkingRight.addAnimationFrame(img`
+    animWalking = animation.createAnimation(ActionKind.Walking, 100)
+    animWalking.addAnimationFrame(img`
         . . . . . . f f f f f f . . . . 
         . . . . f f e e e e f 2 f . . . 
         . . . f f e e e e f 2 2 2 f . . 
@@ -61,7 +68,7 @@ function creerAnims () {
         . . . . . . f f f f f f . . . . 
         . . . . . . . f f f . . . . . . 
         `)
-    animWalkingRight.addAnimationFrame(img`
+    animWalking.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . f f f f f f . . . . 
         . . . . f f e e e e f 2 f . . . 
@@ -79,7 +86,7 @@ function creerAnims () {
         . . . . f f f f f f f f f f . . 
         . . . . . f f . . . f f f . . . 
         `)
-    animWalkingRight.addAnimationFrame(img`
+    animWalking.addAnimationFrame(img`
         . . . . . . f f f f f f . . . . 
         . . . . f f e e e e f 2 f . . . 
         . . . f f e e e e f 2 2 2 f . . 
@@ -97,7 +104,7 @@ function creerAnims () {
         . . . . . . f f f f f f . . . . 
         . . . . . . . f f f . . . . . . 
         `)
-    animWalkingRight.addAnimationFrame(img`
+    animWalking.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . f f f f f f . . . . 
         . . . . f f e e e e f 2 f . . . 
@@ -115,83 +122,9 @@ function creerAnims () {
         . . . . f f f f f f f f f f . . 
         . . . . . f f . . . f f f . . . 
         `)
-    animation.attachAnimation(Zale, animWalkingRight)
-    animWalkingLeft = animation.createAnimation(ActionKind.WalkingLeft, 100)
-    animWalkingLeft.addAnimationFrame(img`
-        . . . . f f f f f f . . . . . . 
-        . . . f 2 f e e e e f f . . . . 
-        . . f 2 2 2 f e e e e f f . . . 
-        . . f e e e e f f e e e f . . . 
-        . f e 2 2 2 2 e e f f f f . . . 
-        . f 2 e f f f f 2 2 2 e f . . . 
-        . f f f e e e f f f f f f f . . 
-        . f e e 4 4 f b e 4 4 e f f . . 
-        . . f e d d f 1 4 d 4 e e f . . 
-        . . . f d d d d 4 e e e f . . . 
-        . . . f e 4 4 4 e e f f . . . . 
-        . . . f 2 2 2 e d d 4 . . . . . 
-        . . . f 2 2 2 e d d e . . . . . 
-        . . . f 5 5 4 f e e f . . . . . 
-        . . . . f f f f f f . . . . . . 
-        . . . . . . f f f . . . . . . . 
-        `)
-    animWalkingLeft.addAnimationFrame(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . f f f f f f . . . . . . 
-        . . . f 2 f e e e e f f . . . . 
-        . . f 2 2 2 f e e e e f f . . . 
-        . . f e e e e f f e e e f . . . 
-        . f e 2 2 2 2 e e f f f f . . . 
-        . f 2 e f f f f 2 2 2 e f . . . 
-        . f f f e e e f f f f f f f . . 
-        . f e e 4 4 f b e 4 4 e f f . . 
-        . . f e d d f 1 4 d 4 e e f . . 
-        . . . f d d d e e e e e f . . . 
-        . . . f e 4 e d d 4 f . . . . . 
-        . . . f 2 2 e d d e f . . . . . 
-        . . f f 5 5 f e e f f f . . . . 
-        . . f f f f f f f f f f . . . . 
-        . . . f f f . . . f f . . . . . 
-        `)
-    animWalkingLeft.addAnimationFrame(img`
-        . . . . f f f f f f . . . . . . 
-        . . . f 2 f e e e e f f . . . . 
-        . . f 2 2 2 f e e e e f f . . . 
-        . . f e e e e f f e e e f . . . 
-        . f e 2 2 2 2 e e f f f f . . . 
-        . f 2 e f f f f 2 2 2 e f . . . 
-        . f f f e e e f f f f f f f . . 
-        . f e e 4 4 f b e 4 4 e f f . . 
-        . . f e d d f 1 4 d 4 e e f . . 
-        . . . f d d d d 4 e e e f . . . 
-        . . . f e 4 4 4 e e f f . . . . 
-        . . . f 2 2 2 e d d 4 . . . . . 
-        . . . f 2 2 2 e d d e . . . . . 
-        . . . f 5 5 4 f e e f . . . . . 
-        . . . . f f f f f f . . . . . . 
-        . . . . . . f f f . . . . . . . 
-        `)
-    animWalkingLeft.addAnimationFrame(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . f f f f f f . . . . . . 
-        . . . f 2 f e e e e f f . . . . 
-        . . f 2 2 2 f e e e e f f . . . 
-        . . f e e e e f f e e e f . . . 
-        . f e 2 2 2 2 e e f f f f . . . 
-        . f 2 e f f f f 2 2 2 e f . . . 
-        . f f f e e e f f f f f f f . . 
-        . f e e 4 4 f b e 4 4 e f f . . 
-        . . f e d d f 1 4 d 4 e e f . . 
-        . . . f d d d d 4 e e e f . . . 
-        . . . f e 4 4 4 e d d 4 . . . . 
-        . . . f 2 2 2 2 e d d e . . . . 
-        . . f f 5 5 4 4 f e e f . . . . 
-        . . f f f f f f f f f f . . . . 
-        . . . f f f . . . f f . . . . . 
-        `)
-    animation.attachAnimation(Zale, animWalkingLeft)
-    animNotMovingRight = animation.createAnimation(ActionKind.IdleRight, 100)
-    animNotMovingRight.addAnimationFrame(img`
+    animation.attachAnimation(Zale, animWalking)
+    animNotMoving = animation.createAnimation(ActionKind.Idle, 100)
+    animNotMoving.addAnimationFrame(img`
         . . . . . . f f f f f f . . . . 
         . . . . f f e e e e f 2 f . . . 
         . . . f f e e e e f 2 2 2 f . . 
@@ -209,29 +142,9 @@ function creerAnims () {
         . . . . . . f f f f f f . . . . 
         . . . . . . . f f f . . . . . . 
         `)
-    animation.attachAnimation(Zale, animNotMovingRight)
-    animNotMovingLeft = animation.createAnimation(ActionKind.IdleLeft, 100)
-    animNotMovingLeft.addAnimationFrame(img`
-        . . . . f f f f f f . . . . . . 
-        . . . f 2 f e e e e f f . . . . 
-        . . f 2 2 2 f e e e e f f . . . 
-        . . f e e e e f f e e e f . . . 
-        . f e 2 2 2 2 e e f f f f . . . 
-        . f 2 e f f f f 2 2 2 e f . . . 
-        . f f f e e e f f f f f f f . . 
-        . f e e 4 4 f b e 4 4 e f f . . 
-        . . f e d d f 1 4 d 4 e e f . . 
-        . . . f d d d d 4 e e e f . . . 
-        . . . f e 4 4 4 e e f f . . . . 
-        . . . f 2 2 2 e d d 4 . . . . . 
-        . . . f 2 2 2 e d d e . . . . . 
-        . . . f 5 5 4 f e e f . . . . . 
-        . . . . f f f f f f . . . . . . 
-        . . . . . . f f f . . . . . . . 
-        `)
-    animation.attachAnimation(Zale, animNotMovingLeft)
-    animAttackRight = animation.createAnimation(ActionKind.AttackRight, 200)
-    animAttackRight.addAnimationFrame(img`
+    animation.attachAnimation(Zale, animNotMoving)
+    animAttack = animation.createAnimation(ActionKind.Attack, 200)
+    animAttack.addAnimationFrame(img`
         .......ff...............
         ....ffff2ff.............
         ..ffeeeef2ff............
@@ -257,57 +170,9 @@ function creerAnims () {
         ........................
         ........................
         `)
-    animation.attachAnimation(Zale, animAttackRight)
-    animAttackLeft = animation.createAnimation(ActionKind.AttackLeft, 200)
-    animAttackLeft.addAnimationFrame(img`
-        ...............ff.......
-        .............ff2ffff....
-        ............ff2feeeeff..
-        ...........ff22feeeeeff.
-        ...........feeeeffeeeef.
-        ..........fe2222eefffff.
-        ..........f2effff222efff
-        ..........fffeeeffffffff
-        ..........fee44fbe44efef
-        ...........feddfb4d4eef.
-        ..........c.eeddd4eeef..
-        ....ccccccceddee2222f...
-        .....dddddcedd44e444f...
-        ......ccccc.eeeefffff...
-        ..........c...ffffffff..
-        ...............ff..fff..
-        ........................
-        ........................
-        ........................
-        ........................
-        ........................
-        ........................
-        ........................
-        ........................
-        `)
-    animation.attachAnimation(Zale, animAttackLeft)
-    animJumpLeft = animation.createAnimation(ActionKind.JumpingLeft, 100)
-    animJumpLeft.addAnimationFrame(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . f f f f f f . . . . . . 
-        . . . f 2 f e e e e f f . . . . 
-        . . f 2 2 2 f e e e e f f . . . 
-        . . f e e e e f f e e e f . . . 
-        . f e 2 2 2 2 e e f f f f . . . 
-        . f 2 e f f f f 2 2 2 e f . . . 
-        . f f f e e e f f f f f f f . . 
-        . f e e 4 4 f b e 4 4 e f f . . 
-        . . f e d d f 1 4 d 4 e e f . . 
-        . . . f d d d e e e e e f . . . 
-        . . . f e 4 e d d 4 f . . . . . 
-        . . . f 2 2 e d d e f . . . . . 
-        . . f f 5 5 f e e f f f . . . . 
-        . . f f f f f f f f f f . . . . 
-        . . . f f f . . . f f . . . . . 
-        `)
-    animation.attachAnimation(Zale, animJumpLeft)
-    animJumpRight = animation.createAnimation(ActionKind.JumpingRight, 100)
-    animJumpRight.addAnimationFrame(img`
+    animation.attachAnimation(Zale, animAttack)
+    animJump = animation.createAnimation(ActionKind.Jumping, 100)
+    animJump.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . f f f f f f . . . . 
         . . . . f f e e e e f 2 f . . . 
@@ -325,7 +190,40 @@ function creerAnims () {
         . . . . f f f f f f f f f f . . 
         . . . . . f f . . . f f f . . . 
         `)
-    animation.attachAnimation(Zale, animJumpRight)
+    animation.attachAnimation(Zale, animJump)
+}
+function Début_du_jeu () {
+    scene.setBackgroundColor(9)
+    Zale = sprites.create(img`
+        . . . . . . f f f f f f . . . . 
+        . . . . f f e e e e f 2 f . . . 
+        . . . f f e e e e f 2 2 2 f . . 
+        . . . f e e e f f e e e e f . . 
+        . . . f f f f e e 2 2 2 2 e f . 
+        . . . f e 2 2 2 f f f f e 2 f . 
+        . . f f f f f f f e e e f f f . 
+        . . f f e 4 4 e b f 4 4 e e f . 
+        . . f e e 4 d 4 1 f d d e f . . 
+        . . . f e e e 4 d d d d f . . . 
+        . . . . f f e e 4 4 4 e f . . . 
+        . . . . . 4 d d e 2 2 2 f . . . 
+        . . . . . e d d e 2 2 2 f . . . 
+        . . . . . f e e f 4 5 5 f . . . 
+        . . . . . . f f f f f f . . . . 
+        . . . . . . . f f f . . . . . . 
+        `, SpriteKind.Player)
+    tiles.placeOnTile(Zale, tiles.getTileLocation(4, 17))
+    info.setScore(0)
+    info.setLife(3)
+    controller.moveSprite(Zale, 100, 0)
+    creerAnims()
+    scene.cameraFollowSprite(Zale)
+    doublejump = false
+    Zale.ay = 150
+    BouncingEnemies()
+    compteur_de_vie = 3
+    Makelevel()
+    characterAnimations.setCharacterState(Zale, characterAnimations.rule(Predicate.NotMoving))
 }
 function Makelevel () {
     tiles.placeOnRandomTile(Zale, assets.tile`myTile22`)
@@ -333,7 +231,7 @@ function Makelevel () {
     liste = [tilemap`levelmap0`, tilemap`niveau1`, tilemap`niveau10`]
     tiles.setCurrentTilemap(liste[niveau])
     BouncingEnemies()
-    for (let valeur of tiles.getTilesByType(assets.tile`myTile15`)) {
+    for (let valeur2 of tiles.getTilesByType(assets.tile`myTile15`)) {
         pièce = sprites.create(assets.image`pièce`, SpriteKind.element)
         animation.runImageAnimation(
         pièce,
@@ -528,10 +426,10 @@ function Makelevel () {
         100,
         true
         )
-        tiles.placeOnTile(pièce, valeur)
-        tiles.setTileAt(valeur, assets.tile`transparency16`)
+        tiles.placeOnTile(pièce, valeur2)
+        tiles.setTileAt(valeur2, assets.tile`transparency16`)
     }
-    for (let valeur2 of tiles.getTilesByType(assets.tile`myTile16`)) {
+    for (let valeur22 of tiles.getTilesByType(assets.tile`myTile16`)) {
         coeur = sprites.create(img`
             . . . . . . . . . . . . . . . . 
             . . f f f f f f . f f f f f f . 
@@ -590,8 +488,8 @@ function Makelevel () {
         400,
         true
         )
-        tiles.placeOnTile(coeur, valeur2)
-        tiles.setTileAt(valeur2, assets.tile`transparency16`)
+        tiles.placeOnTile(coeur, valeur22)
+        tiles.setTileAt(valeur22, assets.tile`transparency16`)
     }
     for (let valeur3 of tiles.getTilesByType(assets.tile`myTile17`)) {
         perle = sprites.create(img`
@@ -617,15 +515,13 @@ function Makelevel () {
     }
 }
 controller.right.onEvent(ControllerButtonEvent.Released, function () {
-    animation.setAction(Zale, ActionKind.IdleRight)
-})
-function walk () {
-    if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingLeft))) {
-        animation.setAction(Zale, ActionKind.WalkingLeft)
-    } else {
-        animation.setAction(Zale, ActionKind.WalkingRight)
+    if (!(isJumping)) {
+        for (let valeur62 of animNotMoving.frames) {
+            valeur62.flipX()
+        }
+        animation.stopAnimation(animation.AnimationTypes.All, Zale)
     }
-}
+})
 function BouncingEnemies () {
     for (let valeur4 of tiles.getTilesByType(assets.tile`myTile9`)) {
         champi = sprites.create(img`
@@ -827,58 +723,19 @@ function BouncingEnemies () {
         ennemirebondir.setFlag(SpriteFlag.Invisible, true)
     }
 }
-function Dédut_du_jeu () {
-    scene.setBackgroundColor(9)
-    Zale = sprites.create(img`
-        . . . . . . f f f f f f . . . . 
-        . . . . f f e e e e f 2 f . . . 
-        . . . f f e e e e f 2 2 2 f . . 
-        . . . f e e e f f e e e e f . . 
-        . . . f f f f e e 2 2 2 2 e f . 
-        . . . f e 2 2 2 f f f f e 2 f . 
-        . . f f f f f f f e e e f f f . 
-        . . f f e 4 4 e b f 4 4 e e f . 
-        . . f e e 4 d 4 1 f d d e f . . 
-        . . . f e e e 4 d d d d f . . . 
-        . . . . f f e e 4 4 4 e f . . . 
-        . . . . . 4 d d e 2 2 2 f . . . 
-        . . . . . e d d e 2 2 2 f . . . 
-        . . . . . f e e f 4 5 5 f . . . 
-        . . . . . . f f f f f f . . . . 
-        . . . . . . . f f f . . . . . . 
-        `, SpriteKind.Player)
-    tiles.placeOnTile(Zale, tiles.getTileLocation(4, 17))
-    info.setScore(0)
-    info.setLife(3)
-    controller.moveSprite(Zale, 100, 0)
-    creerAnims()
-    scene.cameraFollowSprite(Zale)
-    doublejump = false
-    Zale.ay = 150
-    BouncingEnemies()
-    compteur_de_vie = 3
-    Makelevel()
-    animation.attachAnimation(Zale, animNotMovingRight)
-}
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    jump()
-    if (Zale.isHittingTile(CollisionDirection.Bottom)) {
+    if (!(isJumping)) {
+        animation.setAction(Zale, ActionKind.Jumping)
         Zale.vy += -100
         music.play(music.createSoundEffect(WaveShape.Square, 400, 600, 255, 0, 300, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
+        isJumping = true
         doublejump = true
-    } else if (doublejump == true) {
+    } else if (doublejump) {
         Zale.vy += -70
         music.play(music.createSoundEffect(WaveShape.Square, 400, 600, 255, 0, 300, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
         doublejump = false
     }
 })
-function attack () {
-    if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingLeft))) {
-        animation.setAction(Zale, ActionKind.AttackLeft)
-    } else {
-        animation.setAction(Zale, ActionKind.AttackRight)
-    }
-}
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile21`, function (sprite, location) {
     if (controller.up.isPressed()) {
         niveau += 1
@@ -892,110 +749,55 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.element, function (sprite, other
     music.play(music.melodyPlayable(music.baDing), music.PlaybackMode.UntilDone)
 })
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (0 == 0) {
-        attack()
-        if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingRight))) {
-            projectile = sprites.createProjectileFromSprite(img`
-                . . . . . . . . . . . . 1 b . . 
-                . . . . . . . . . . . . 1 b . . 
-                . . . . . . . . . . . . . b . . 
-                . . . . . . . . . . . . 1 b . . 
-                . . . . . . . . . . . . . b . . 
-                . . . . . . . . . . . . 1 b . . 
-                . . . . . . . . . . . . b . . . 
-                . . . . . . . . . . 1 . b . . . 
-                . . . . . . . . . . . b . . . . 
-                . . . . . . . . . 1 b . . . . . 
-                . . . . . . . . . b . . . . . . 
-                . . . . . . . . b . . . . . . . 
-                . . 1 . 1 . b b . . . . . . . . 
-                b b b b b b 1 . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                `, Zale, 120, 0)
-        } else if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingLeft))) {
-            projectile = sprites.createProjectileFromSprite(img`
-                . . b 1 . . . . . . . . . . . . 
-                . . b 1 . . . . . . . . . . . . 
-                . . b . . . . . . . . . . . . . 
-                . . b 1 . . . . . . . . . . . . 
-                . . b . . . . . . . . . . . . . 
-                . . b 1 . . . . . . . . . . . . 
-                . . . b . . . . . . . . . . . . 
-                . . . b . 1 . . . . . . . . . . 
-                . . . . b . . . . . . . . . . . 
-                . . . . . b 1 . . . . . . . . . 
-                . . . . . . b . . . . . . . . . 
-                . . . . . . . b . . . . . . . . 
-                . . . . . . . . b b . 1 . 1 . . 
-                . . . . . . . . . 1 b b b b b b 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                `, Zale, -120, 0)
+    if (!(isAttacking)) {
+        isAttacking = true
+        projectile = sprites.createProjectileFromSprite(img`
+            . . . . . . . . . . . . 1 b . . 
+            . . . . . . . . . . . . 1 b . . 
+            . . . . . . . . . . . . . b . . 
+            . . . . . . . . . . . . 1 b . . 
+            . . . . . . . . . . . . . b . . 
+            . . . . . . . . . . . . 1 b . . 
+            . . . . . . . . . . . . b . . . 
+            . . . . . . . . . . 1 . b . . . 
+            . . . . . . . . . . . b . . . . 
+            . . . . . . . . . 1 b . . . . . 
+            . . . . . . . . . b . . . . . . 
+            . . . . . . . . b . . . . . . . 
+            . . 1 . 1 . b b . . . . . . . . 
+            b b b b b b 1 . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, Zale, 120, 0)
+        if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingLeft))) {
+            projectile.image.flipX()
         }
         pause(200)
         sprites.destroy(projectile)
-    } else {
-        if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingRight))) {
-            projectile3 = sprites.createProjectileFromSprite(img`
-                . . . . . . . . . . . . . . . . 
-                . . . . . . 4 4 4 4 . . . . . . 
-                . . . . 4 4 4 5 5 4 4 4 . . . . 
-                . . . 3 3 3 3 4 4 4 4 4 4 . . . 
-                . . 4 3 3 3 3 2 2 2 1 1 4 4 . . 
-                . . 3 3 3 3 3 2 2 2 1 1 5 4 . . 
-                . 4 3 3 3 3 2 2 2 2 2 5 5 4 4 . 
-                . 4 3 3 3 2 2 2 4 4 4 4 5 4 4 . 
-                . 4 4 3 3 2 2 4 4 4 4 4 4 4 4 . 
-                . 4 2 3 3 2 2 4 4 4 4 4 4 4 4 . 
-                . . 4 2 3 3 2 4 4 4 4 4 2 4 . . 
-                . . 4 2 2 3 2 2 4 4 4 2 4 4 . . 
-                . . . 4 2 2 2 2 2 2 2 2 4 . . . 
-                . . . . 4 4 2 2 2 2 4 4 . . . . 
-                . . . . . . 4 4 4 4 . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                `, Zale, 100, 0)
-        } else if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingLeft))) {
-            projectile4 = sprites.createProjectileFromSprite(img`
-                . . . . . . . . . . . . . . . . 
-                . . . . . . 4 4 4 4 . . . . . . 
-                . . . . 4 4 4 5 5 4 4 4 . . . . 
-                . . . 3 3 3 3 4 4 4 4 4 4 . . . 
-                . . 4 3 3 3 3 2 2 2 1 1 4 4 . . 
-                . . 3 3 3 3 3 2 2 2 1 1 5 4 . . 
-                . 4 3 3 3 3 2 2 2 2 2 5 5 4 4 . 
-                . 4 3 3 3 2 2 2 4 4 4 4 5 4 4 . 
-                . 4 4 3 3 2 2 4 4 4 4 4 4 4 4 . 
-                . 4 2 3 3 2 2 4 4 4 4 4 4 4 4 . 
-                . . 4 2 3 3 2 4 4 4 4 4 2 4 . . 
-                . . 4 2 2 3 2 2 4 4 4 2 4 4 . . 
-                . . . 4 2 2 2 2 2 2 2 2 4 . . . 
-                . . . . 4 4 2 2 2 2 4 4 . . . . 
-                . . . . . . 4 4 4 4 . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                `, Zale, -100, 0)
-        }
-        music.play(music.melodyPlayable(music.pewPew), music.PlaybackMode.UntilDone)
-        pause(1000)
-        sprites.destroy(projectile3)
-        sprites.destroy(projectile4)
+        isAttacking = false
     }
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    animation.setAction(Zale, ActionKind.WalkingRight)
+    if (!(isFacingRight)) {
+        for (let valeur6 of animWalking.frames) {
+            valeur6.flipX()
+        }
+        isFacingRight = true
+    }
+    if (!(isJumping)) {
+        animation.setAction(Zale, ActionKind.Walking)
+    }
 })
 info.onLifeZero(function () {
     game.gameOver(false)
 })
-function jump () {
-    if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingLeft))) {
-        animation.setAction(Zale, ActionKind.JumpingLeft)
-    } else {
-        animation.setAction(Zale, ActionKind.JumpingRight)
-    }
-}
 controller.left.onEvent(ControllerButtonEvent.Released, function () {
-    animation.setAction(Zale, ActionKind.IdleLeft)
+    if (!(isJumping)) {
+        for (let valeur622 of animNotMoving.frames) {
+            valeur622.flipX()
+        }
+        animation.stopAnimation(animation.AnimationTypes.All, Zale)
+    }
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.element3, function (sprite, otherSprite) {
     info.changeScoreBy(100)
@@ -1004,7 +806,15 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.element3, function (sprite, othe
     music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.UntilDone)
 })
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    animation.setAction(Zale, ActionKind.WalkingLeft)
+    if (isFacingRight) {
+        for (let valeur7 of animWalking.frames) {
+            valeur7.flipX()
+        }
+        isFacingRight = false
+    }
+    if (!(isJumping)) {
+        animation.setAction(Zale, ActionKind.Walking)
+    }
 })
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.enemybounce, function (sprite, otherSprite) {
     sprite.vx = sprite.vx * -1
@@ -1019,10 +829,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
     compteur_de_vie += -1
     music.play(music.melodyPlayable(music.smallCrash), music.PlaybackMode.UntilDone)
 })
-let projectile4: Sprite = null
-let projectile3: Sprite = null
 let projectile: Sprite = null
-let doublejump = false
 let ennemirebondir: Sprite = null
 let champi: Sprite = null
 let perle: Sprite = null
@@ -1030,33 +837,19 @@ let coeur: Sprite = null
 let pièce: Sprite = null
 let niveau = 0
 let liste: tiles.TileMapData[] = []
-let animJumpRight: animation.Animation = null
-let animJumpLeft: animation.Animation = null
-let animAttackLeft: animation.Animation = null
-let animAttackRight: animation.Animation = null
-let animNotMovingLeft: animation.Animation = null
-let animNotMovingRight: animation.Animation = null
-let animWalkingLeft: animation.Animation = null
+let doublejump = false
+let animJump: animation.Animation = null
+let animAttack: animation.Animation = null
 let Zale: Sprite = null
-let animWalkingRight: animation.Animation = null
 let compteur_de_vie = 0
+let isAttacking = false
+let isFacingRight = false
+let isJumping = false
 let menu = 0
+let animWalking: animation.Animation = null
+let animNotMoving: animation.Animation = null
+isJumping = false
+isFacingRight = true
+isAttacking = false
 music.play(music.stringPlayable("E D G F B A C5 B ", 120), music.PlaybackMode.UntilDone)
-Dédut_du_jeu()
-game.onUpdate(function () {
-    if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.HittingWallDown))) {
-        if (characterAnimations.matchesRule(Zale, ActionKind.JumpingLeft) && characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingLeft))) {
-            if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.MovingLeft))) {
-                animation.setAction(Zale, ActionKind.WalkingLeft)
-            } else {
-                animation.setAction(Zale, ActionKind.IdleLeft)
-            }
-        } else if (characterAnimations.matchesRule(Zale, ActionKind.JumpingRight) && characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.FacingRight))) {
-            if (characterAnimations.matchesRule(Zale, characterAnimations.rule(Predicate.MovingRight))) {
-                animation.setAction(Zale, ActionKind.WalkingRight)
-            } else {
-                animation.setAction(Zale, ActionKind.IdleRight)
-            }
-        }
-    }
-})
+Début_du_jeu()
